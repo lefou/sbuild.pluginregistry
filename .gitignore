@@ -1,0 +1,5 @@
+.sbuild
+target/
+bin/
+.cache
+.scala_dependencies
