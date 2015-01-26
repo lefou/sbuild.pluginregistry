@@ -4,7 +4,7 @@ import org.scalatest.FreeSpec
 
 import scala.util.Success
 
-class ArtifactRepoTest extends FreeSpec {
+class ArtifactRepoFunctionsTest extends FreeSpec {
 
   val a1 = Artifact("a", "1", location = "???")
   val a2 = Artifact("a", "2", location = "???")
@@ -16,15 +16,15 @@ class ArtifactRepoTest extends FreeSpec {
     val artifacts = Seq(a1)
 
     "Find a" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a"))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a"))))
       assert(res === Success(Seq(a1)))
     }
     "Find a:1" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("1")))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("1")))))
       assert(res === Success(Seq(a1)))
     }
     "Fail a:2" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("2")))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("2")))))
       val ex = intercept[ArtifactNotFoundException](res.get)
       assert(ex.getMessage startsWith "Cannot find artifact that resolves dependency: ")
       assert(ex.dependency == Dependency("a", Constraint.Version("2")))
@@ -35,7 +35,7 @@ class ArtifactRepoTest extends FreeSpec {
     val artifacts = Seq(a1, a2)
 
     "Find a:2" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("2")))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("2")))))
       assert(res === Success(Seq(a2)))
     }
   }
@@ -44,7 +44,7 @@ class ArtifactRepoTest extends FreeSpec {
     val artifacts = Seq(a3)
 
     "Fail a:3 because of missing b:1" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("3")))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("3")))))
       val ex = intercept[OverconstrainedDependenciesException](res.get)
       // assert(ex.getMessage === "Cannot find artifact that resolves dependency: Dependency(a,List(Version(2)))")
     }
@@ -54,22 +54,22 @@ class ArtifactRepoTest extends FreeSpec {
     val artifacts = Seq(a1, a2, a3, b1, b2)
 
     "Find b:1" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("b", Constraint.Version("1")))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("b", Constraint.Version("1")))))
       assert(res === Success(Seq(b1)))
     }
 
     "Find a:3" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("3")))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.Version("3")))))
       assert(res === Success(Seq(a3, b1)))
     }
 
     "Find a:3 by version range" in {
-      val res = ArtifactRepo.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.VersionRange("[3, 3]")))))
+      val res = ArtifactRepoFunctions.resolve(ResolveState("compile", artifacts, unresolvedDependencies = Seq(Dependency("a", Constraint.VersionRange("[3, 3]")))))
       assert(res === Success(Seq(a3, b1)))
     }
   }
 
-  println("FAIL " + ArtifactRepo.resolve(ResolveState(
+  println("FAIL " + ArtifactRepoFunctions.resolve(ResolveState(
     dependencyScope = "compile",
     availableArtifacts = Seq(
       Artifact("a", "1", location = "???", dependencies = Map("compile" -> Seq(Dependency("b", Constraint.VersionRange("1"))))),
@@ -78,7 +78,7 @@ class ArtifactRepoTest extends FreeSpec {
     ),
     unresolvedDependencies = Seq(Dependency(name = "a", Constraint.VersionRange("1"))))))
 
-  println("FAIL " + ArtifactRepo.resolve(ResolveState(
+  println("FAIL " + ArtifactRepoFunctions.resolve(ResolveState(
     dependencyScope = "compile",
     availableArtifacts = Seq(
       Artifact("a", "1", location = "???", dependencies = Map("compile" -> Seq(

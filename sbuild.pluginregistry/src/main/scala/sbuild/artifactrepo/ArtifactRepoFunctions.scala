@@ -1,8 +1,9 @@
 package sbuild.artifactrepo
 
-import scala.util.Try
 import scala.util.Failure
 import scala.util.Success
+import scala.util.Try
+
 import sbuild.pluginregistry.internal.OSGiVersion
 import sbuild.pluginregistry.internal.OSGiVersionRange
 
@@ -17,7 +18,7 @@ case class ResolveState(
   resolvedArtifacts: Seq[Artifact] = Seq(),
   unresolvedDependencies: Seq[Dependency] = Seq())
 
-object ArtifactRepo {
+object ArtifactRepoFunctions {
 
   def filterArtifacts(artifacts: Seq[Artifact], dep: Dependency): Seq[Artifact] = {
     def matchConstraints(artifact: Artifact, constraints: Set[Constraint]): Boolean = {
@@ -83,7 +84,7 @@ object ArtifactRepo {
 
 trait Resolver {
   type ResolveResult = Try[Seq[Artifact]]
-  
+
   def resolve(resolveState: ResolveState): ResolveResult
 }
 

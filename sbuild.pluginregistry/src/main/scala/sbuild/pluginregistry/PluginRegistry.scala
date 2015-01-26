@@ -2,7 +2,7 @@ package sbuild.pluginregistry
 
 import scala.util.Try
 import sbuild.artifactrepo.Artifact
-import sbuild.artifactrepo.ArtifactRepo
+import sbuild.artifactrepo.ArtifactRepoFunctions
 import sbuild.artifactrepo.Constraint
 import sbuild.artifactrepo.Dependency
 import scala.util.Success
@@ -45,7 +45,7 @@ case class Plugin(
 object PluginRegistry {
 
   def findPlugins(artifacts: Seq[Artifact], constraints: Set[Constraint]): Seq[Plugin] = {
-    val pluginArtifacts = ArtifactRepo.filterArtifacts(artifacts, Dependency(constraints))
+    val pluginArtifacts = ArtifactRepoFunctions.filterArtifacts(artifacts, Dependency(constraints))
     pluginArtifacts.map(Plugin.fromArtifact).collect { case Success(p) => p }
   }
   
